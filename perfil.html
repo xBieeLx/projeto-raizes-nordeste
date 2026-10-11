@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Raízes do Nordeste - Meu Perfil</title>
+    <style>
+        :root {
+            --brand-color: #D35400;
+            --bg-color: #FAFAFA;
+            --surface-color: #FFFFFF;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --border-color: #EAEAEA;
+            --success-color: #27AE60;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); }
+
+        .topbar {
+            background-color: var(--surface-color);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-btn, .logout-btn {
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .back-btn { color: var(--text-main); }
+        .logout-btn { color: #E74C3C; background: none; border: none; font-size: 1rem; }
+
+        .container { padding: 2rem; max-width: 800px; margin: 0 auto; }
+        
+        .profile-header { margin-bottom: 2rem; }
+        .profile-header h1 { color: var(--brand-color); margin-bottom: 0.5rem; }
+
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card h3 { margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+
+        .status-badge {
+            display: inline-block;
+            background-color: #E8F5E9;
+            color: var(--success-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        .history-item:last-child { border-bottom: none; }
+        .history-date { color: var(--text-muted); font-size: 0.9rem; }
+        
+        .input-style {
+            padding: 0.6rem; 
+            border: 1px solid var(--border-color); 
+            border-radius: 6px;
+        }
+        
+        .btn-style {
+            padding: 0.6rem 1.5rem; 
+            background: var(--brand-color); 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: bold;
+        }
+        .badge-pedido { padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: bold; margin-left: 0.5rem; display: inline-block; }
+        .badge-andamento { background-color: #FFF3E0; color: #D35400; }
+        .badge-concluido { background-color: #E8F5E9; color: #27AE60; }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <a href="index.html" class="back-btn">← Voltar ao Menu</a>
+        <button class="logout-btn" onclick="fazerLogout()">Sair</button>
+    </header>
+
+    <div class="container">
+        <div class="profile-header">
+            <h1 id="nomeUsuario">Olá, Visitante</h1>
+        </div>
+
+        <!-- dados do user (só deixa mudar o telefone pra evitar fraude) -->
+        <div class="card">
+            <h3>Dados Cadastrais</h3>
+            <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem;">
+                <div style="flex:1;">
+                    <span style="font-size: 0.9rem; color: var(--text-muted); display: block;">Telefone de Contato</span>
+                    <input type="tel" id="editTelefone" placeholder="(00) 00000-0000" class="input-style" style="width: 100%; margin-top: 0.3rem;">
+                </div>
+                <button onclick="salvarTelefone()" class="btn-style" style="margin-top: 1.2rem;">Atualizar</button>
+            </div>
+        </div>
+
+        <!-- lista de enderecos -->
+        <div class="card">
+            <h3>Meus Endereços</h3>
+            
+            <div id="listaEnderecos" style="margin: 1rem 0; display:flex; flex-direction:column; gap:0.5rem;">
+                <!-- o js vai colocar os enderecos aqui dentro -->
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem; margin-top: 1rem; border-top: 1px dashed var(--border-color); padding-top: 1rem;">
+                <input type="text" id="novoEndTitulo" placeholder="Ex: Casa, Trabalho" class="input-style" style="width: 140px;">
+                <input type="text" id="novoEndTexto" placeholder="Rua, Número e Bairro" class="input-style" style="flex:1;">
+                <button onclick="adicionarEndereco()" class="btn-style" style="background:var(--text-main);">+ Adicionar</button>
+            </div>
+        </div>
+
+        <!-- loja padrao do cara -->
+        <div class="card">
+            <h3>Unidade de Preferência</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem;">Esta loja fará o preparo do seu Delivery ou Retirada.</p>
+            <div style="display: flex; gap: 0.5rem;">
+                <select id="editUnidade" class="input-style" style="flex: 1;">
+                    <option value="Recife">Matriz (Recife - PE)</option>
+                    <option value="São Paulo">Filial São Paulo - SP</option>
+                    <option value="Curitiba">Filial Curitiba - PR</option>
+                    <option value="Porto Alegre">Filial Porto Alegre - RS</option>
+                    <option value="Florianópolis">Filial Florianópolis - SC</option>
+                    <option value="Campo Grande">Filial Campo Grande - MS</option>
+                </select>
+                <button onclick="salvarUnidade()" class="btn-style">Salvar</button>
+            </div>
+        </div>
+
+        <!-- pontuacao -->
+        <div class="card">
+            <h3>Programa Raízes</h3>
+            <p>Você possui <strong style="color: var(--brand-color); font-size: 1.2rem;">200 pontos</strong></p>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">Faltam 50 pontos para resgatar sua próxima Tapioca grátis!</p>
+        </div>
+
+        <!-- pedidos em aberto e historico antigo -->
+        <div class="card">
+            <h3>Meus Pedidos</h3>
+            <div id="listaPedidosUsuario" style="display:flex; flex-direction:column; gap:1rem; margin-top:1rem;">
+                <!-- o js vai preencher -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // puxa quem está logado
+        const clienteLogado = localStorage.getItem("cliente_logado");
+        if (!clienteLogado) {
+            window.location.href = "login.html"; // joga para tela de login se não estiver logado
+        } else {
+            document.getElementById("nomeUsuario").textContent = `Olá, ${clienteLogado}`;
+        }
+
+        // controle do telefone
+        document.getElementById("editTelefone").value = localStorage.getItem("cliente_telefone") || "";
+
+        function salvarTelefone() {
+            localStorage.setItem("cliente_telefone", document.getElementById("editTelefone").value);
+            alert("Telefone atualizado com sucesso!");
+        }
+
+        // controle da loja favorita
+        const unidadeAtual = localStorage.getItem("unidade_selecionada");
+        if(unidadeAtual) {
+            document.getElementById("editUnidade").value = unidadeAtual;
+        }
+
+        function salvarUnidade() {
+            const novaUnidade = document.getElementById("editUnidade").value;
+            localStorage.setItem("unidade_selecionada", novaUnidade);
+            alert(`Unidade alterada para ${novaUnidade} com sucesso!`);
+        }
+
+        // salva os enderecos com try/catch para não quebrar a tela se tiver lixo no storage
+        let enderecos = [];
+        try {
+            enderecos = JSON.parse(localStorage.getItem("enderecos_cliente")) || [];
+        } catch (e) {
+            enderecos = [];
+        }
+
+        function renderizarEnderecos() {
+            const container = document.getElementById("listaEnderecos");
+            if (enderecos.length === 0) {
+                container.innerHTML = "<p style='color: var(--text-muted); font-size:0.9rem;'>Nenhum endereço salvo.</p>";
+                return;
+            }
+            container.innerHTML = "";
+            enderecos.forEach((end, index) => {
+                container.innerHTML += `
+                    <div style="background:#F8F9FA; padding:0.8rem; border-radius:6px; border:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <strong>${end.titulo}</strong>
+                            <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.2rem;">${end.texto}</p>
+                        </div>
+                        <button onclick="removerEndereco(${index})" style="background:none; border:none; color:#E74C3C; cursor:pointer; font-weight:bold; font-size:1.1rem;">X</button>
+                    </div>
+                `;
+            });
+        }
+
+        function adicionarEndereco() {
+            const titulo = document.getElementById("novoEndTitulo").value.trim();
+            const texto = document.getElementById("novoEndTexto").value.trim();
+            
+            if (titulo === "" || texto === "") {
+                alert("Por favor, preencha o título e o endereço!");
+                return;
+            }
+            
+            enderecos.push({ titulo, texto });
+            localStorage.setItem("enderecos_cliente", JSON.stringify(enderecos));
+            
+            document.getElementById("novoEndTitulo").value = "";
+            document.getElementById("novoEndTexto").value = "";
+            renderizarEnderecos();
+        }
+
+        function removerEndereco(index) {
+            enderecos.splice(index, 1);
+            localStorage.setItem("enderecos_cliente", JSON.stringify(enderecos));
+            renderizarEnderecos();
+        }
+
+        // joga a lista de enderecos na tela na hora que abre
+        renderizarEnderecos();
+
+        // mistura os pedidos ativos com os passados
+        function renderizarPedidos() {
+            const container = document.getElementById("listaPedidosUsuario");
+            container.innerHTML = "";
+            const pedidoAtual = localStorage.getItem("pedido_em_andamento");
+
+            // se tiver um pedido em andamento, joga no topo e com destaque
+            if (pedidoAtual) {
+                container.innerHTML += `
+                    <div class="history-item" style="border: 1px solid var(--brand-color); padding: 1rem; border-radius: 8px; background: #FFF9F5;">
+                        <div>
+                            <p style="display:flex; align-items:center;"><strong>Pedido Recente</strong> <span class="badge-pedido badge-andamento">Na Cozinha</span></p>
+                            <p class="history-date">Hoje - Agora mesmo</p>
+                        </div>
+                        <p style="font-weight:bold; color:var(--brand-color); font-size: 0.9rem;">Acompanhar</p>
+                    </div>
+                `;
+            }
+
+            // dados fakes dos ultimos pedidos
+            container.innerHTML += `
+                <div class="history-item">
+                    <div>
+                        <p style="display:flex; align-items:center;"><strong>Pedido #1042</strong> <span class="badge-pedido badge-concluido">Concluído</span></p>
+                        <p class="history-date">12 de Setembro - 14:30</p>
+                    </div>
+                    <p>R$ 42,50</p>
+                </div>
+                <div class="history-item">
+                    <div>
+                        <p style="display:flex; align-items:center;"><strong>Pedido #0988</strong> <span class="badge-pedido badge-concluido">Concluído</span></p>
+                        <p class="history-date">05 de Setembro - 19:15</p>
+                    </div>
+                    <p>R$ 18,00</p>
+                </div>
+            `;
+        }
+
+        renderizarPedidos();
+
+        // apaga os dados do localstorage pra deslogar
+        function fazerLogout() {
+            localStorage.removeItem("cliente_logado");
+            localStorage.removeItem("unidade_selecionada");
+            localStorage.removeItem("carrinho");
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

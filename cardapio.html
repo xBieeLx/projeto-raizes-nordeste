@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Raízes do Nordeste - Cardápio</title>
+    <style>
+        :root {
+            --brand-color: #D35400;
+            --bg-color: #FAFAFA;
+            --surface-color: #FFFFFF;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --border-color: #EAEAEA;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 80px; /* espaço pro carrinho não sumir no celular */
+        }
+
+        /* barra do topo */
+        .topbar {
+            background-color: var(--surface-color);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .user-info h2 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            font-size: 0.8rem;
+            color: var(--brand-color);
+            font-weight: 500;
+        }
+
+        .loyalty-badge {
+            background-color: #FFF3E0;
+            color: var(--brand-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border: 1px solid #FFE0B2;
+        }
+
+        .container {
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            margin: 1.5rem 0 1rem 0;
+            font-size: 1.2rem;
+            border-bottom: 2px solid var(--text-main);
+            display: inline-block;
+            padding-bottom: 0.2rem;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        /* estilo de cada produto */
+        .product-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.1s;
+        }
+
+        .product-card:active {
+            transform: scale(0.98);
+        }
+
+        .product-info h3 {
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .product-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .price {
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        .add-btn {
+            background-color: transparent;
+            color: var(--brand-color);
+            border: 1px solid var(--brand-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* carrinho preso embaixo */
+        .cart-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--brand-color);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .cart-bar.hidden {
+            display: none;
+        }
+
+        .cart-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-total {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .checkout-btn {
+            background-color: white;
+            color: var(--brand-color);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* ajustes pra tela de pc */
+        @media (min-width: 768px) {
+            body { padding-bottom: 0; }
+            .container {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 2rem;
+            }
+            .product-grid { grid-template-columns: repeat(2, 1fr); }
+            
+            /* joga o carrinho pra lateral */
+            .cart-bar {
+                position: sticky;
+                top: 80px;
+                height: fit-content;
+                flex-direction: column;
+                border-radius: 8px;
+                padding: 1.5rem;
+            }
+            .checkout-btn { width: 100%; margin-top: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <div class="user-info">
+            <h2 id="userName">Visitante</h2>
+            <p id="unitName">Unidade não selecionada</p>
+        </div>
+        <div class="loyalty-badge">
+            <span id="userPoints">0</span> pts
+        </div>
+    </header>
+
+    <div class="container">
+        <main>
+            <h2 class="section-title">Clássicos</h2>
+            <div class="product-grid" id="menu-grid">
+                <!-- js vai colocar os produtos aqui -->
+            </div>
+        </main>
+
+        <aside class="cart-bar hidden" id="cartBar">
+            <div class="cart-info">
+                <span id="cartCount">0 itens</span>
+                <span class="cart-total" id="cartTotal">R$ 0,00</span>
+            </div>
+            <button class="checkout-btn" onclick="irParaCheckout()">Finalizar</button>
+        </aside>
+    </div>
+
+    <script>
+        // pega quem logou e a loja escolhida
+        const clienteLogado = localStorage.getItem("cliente_logado") || "Cliente";
+        const unidadeSelecionada = localStorage.getItem("unidade_selecionada") || "Matriz";
+        
+        document.getElementById("userName").textContent = `Olá, ${clienteLogado}`;
+        document.getElementById("unitName").textContent = `Loja: ${unidadeSelecionada.replace('-', ' ').toUpperCase()}`;
+        
+        // pontuação aleatória
+        document.getElementById("userPoints").textContent = Math.floor(Math.random() * 500) + 50;
+
+        // produtos pra testar o layout
+        const produtos = [
+            { id: 1, nome: "Tapioca de Carne de Sol", desc: "Com queijo coalho derretido", preco: 22.50 },
+            { id: 2, nome: "Cuscuz Completo", desc: "Ovo, calabresa e manteiga de garrafa", preco: 18.00 },
+            { id: 3, nome: "Bolo de Macaxeira", desc: "Fatia servida quente", preco: 12.00 },
+            { id: 4, nome: "Suco de Cajá", desc: "500ml - Natural da fruta", preco: 9.50 }
+        ];
+
+        let carrinho = [];
+
+        // joga os produtos na tela
+        function carregarCardapio() {
+            const grid = document.getElementById("menu-grid");
+            produtos.forEach(produto => {
+                const card = document.createElement("div");
+                card.className = "product-card";
+                card.innerHTML = `
+                    <div class="product-info">
+                        <h3>${produto.nome}</h3>
+                        <p>${produto.desc}</p>
+                        <span class="price">R$ ${produto.preco.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                    <button class="add-btn" onclick="adicionarAoCarrinho(${produto.id}, '${produto.nome}', ${produto.preco})">+</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // carrinho
+        function adicionarAoCarrinho(id, nome, preco) {
+            carrinho.push({ id, nome, preco });
+            atualizarInterfaceCarrinho();
+        }
+
+        function atualizarInterfaceCarrinho() {
+            const cartBar = document.getElementById("cartBar");
+            const cartCount = document.getElementById("cartCount");
+            const cartTotal = document.getElementById("cartTotal");
+
+            if (carrinho.length > 0) {
+                cartBar.classList.remove("hidden");
+            }
+
+            const total = carrinho.reduce((sum, item) => sum + item.preco, 0);
+            
+            cartCount.textContent = `${carrinho.length} item(ns)`;
+            cartTotal.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+            
+            // guarda tudo pra usar na aba de checkout
+            localStorage.setItem("carrinho", JSON.stringify(carrinho));
+            localStorage.setItem("total_carrinho", total);
+        }
+
+        function irParaCheckout() {
+            alert("Indo para o pagamento...");
+            window.location.href = "checkout.html";
+        }
+
+        carregarCardapio();
+    </script>
+</body>
+</html>

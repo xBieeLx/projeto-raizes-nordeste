@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Raízes do Nordeste - Acesso</title>
+    <style>
+        :root {
+            --brand-color: #D35400;
+            --bg-color: #FAFAFA;
+            --text-main: #111111;
+            --surface-color: #FFFFFF;
+            --border-color: #EAEAEA;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .auth-container {
+            background-color: var(--surface-color);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--brand-color);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        /* abas de login/cadastro */
+        .tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.8rem;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            color: var(--brand-color);
+            border-bottom: 2px solid var(--brand-color);
+            margin-bottom: -2px;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--brand-color);
+        }
+
+        .row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .row .input-group {
+            flex: 1;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--brand-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--brand-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        /* barra do lgpd */
+        .lgpd-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #2C3E50;
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            z-index: 1000;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .lgpd-banner button {
+            padding: 0.6rem 1.5rem;
+            background-color: white;
+            color: #2C3E50;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        @media (min-width: 768px) {
+            .lgpd-banner {
+                flex-direction: row;
+                justify-content: space-between;
+                text-align: left;
+                padding: 1.5rem 3rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="auth-container">
+        <h1 class="logo">Raízes do Nordeste</h1>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('login')">Entrar</button>
+            <button class="tab-btn" onclick="switchTab('register')">Criar Conta</button>
+        </div>
+
+        <!-- form de login -->
+        <form id="loginForm" class="form-section active">
+            <div class="input-group">
+                <label for="loginUnidade">Unidade de Retirada</label>
+                <select id="loginUnidade" required>
+                    <option value="" disabled selected>Selecione a loja...</option>
+                    <option value="Recife">Matriz (Recife - PE)</option>
+                    <option value="São Paulo">Filial São Paulo - SP</option>
+                    <option value="Curitiba">Filial Curitiba - PR</option>
+                    <option value="Porto Alegre">Filial Porto Alegre - RS</option>
+                    <option value="Florianópolis">Filial Florianópolis - SC</option>
+                    <option value="Campo Grande">Filial Campo Grande - MS</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>E-mail ou CPF</label>
+                <input type="text" id="loginIdentificacao" placeholder="Digite seu acesso" required>
+            </div>
+            <div class="input-group">
+                <label>Senha</label>
+                <input type="password" required>
+            </div>
+            <button type="submit" class="submit-btn">Entrar e Pedir</button>
+        </form>
+
+        <!-- form de criar conta -->
+        <form id="registerForm" class="form-section">
+            <div class="input-group">
+                <label>Nome Completo</label>
+                <input type="text" id="cadNome" placeholder="Ex: João da Silva" required>
+            </div>
+            <div class="input-group">
+                <label>E-mail</label>
+                <input type="email" id="cadEmail" placeholder="seu@email.com" required>
+            </div>
+            <div class="row">
+                <div class="input-group">
+                    <label>CPF</label>
+                    <input type="text" placeholder="000.000.000-00" required>
+                </div>
+                <div class="input-group">
+                    <label>Telefone</label>
+                    <input type="tel" placeholder="(00) 00000-0000" required>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Endereço Completo</label>
+                <input type="text" placeholder="Rua, Número e Bairro" required>
+            </div>
+            <div class="row">
+                <div class="input-group">
+                    <label>Cidade</label>
+                    <input type="text" placeholder="Ex: Recife" required>
+                </div>
+                <div class="input-group">
+                    <label>Unidade Preferida</label>
+                    <select id="cadUnidade" required>
+                        <option value="" disabled selected>Onde você costuma pedir?</option>
+                        <option value="Recife">Matriz (Recife - PE)</option>
+                        <option value="São Paulo">Filial São Paulo - SP</option>
+                        <option value="Curitiba">Filial Curitiba - PR</option>
+                        <option value="Porto Alegre">Filial Porto Alegre - RS</option>
+                        <option value="Florianópolis">Filial Florianópolis - SC</option>
+                        <option value="Campo Grande">Filial Campo Grande - MS</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Senha</label>
+                    <input type="password" required>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>
+                    <input type="checkbox" required style="width: auto; display: inline-block; margin-right: 5px;">
+                    Aceito os termos de uso e política de privacidade (LGPD)
+                </label>
+            </div>
+            <button type="submit" class="submit-btn">Finalizar Cadastro</button>
+        </form>
+
+        <a href="index.html" class="back-link">← Voltar ao cardápio</a>
+    </main>
+
+    <div class="lgpd-banner" id="lgpdBanner">
+        <p>Utilizamos cookies e dados pessoais para melhorar sua experiência, garantir a segurança do seu acesso e
+            gerenciar nosso programa de fidelidade. Ao continuar, você concorda com nossa Política de Privacidade.</p>
+        <button onclick="aceitarLGPD()">Aceitar e Continuar</button>
+    </div>
+
+    <script>
+        // troca as telas (login/cadastro)
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.form-section').forEach(form => form.classList.remove('active'));
+
+            if (tabId === 'login') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+            }
+        }
+
+        // esconde o aviso de cookies se ja aceitou antes
+        document.addEventListener("DOMContentLoaded", () => {
+            if (localStorage.getItem("lgpd_aceito") === "true") {
+                document.getElementById("lgpdBanner").style.display = "none";
+            }
+        });
+        function aceitarLGPD() {
+            localStorage.setItem("lgpd_aceito", "true");
+            document.getElementById("lgpdBanner").style.display = "none";
+        }
+
+        // quando clica em entrar
+        document.getElementById("loginForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const unidade = document.getElementById("loginUnidade").value;
+            let identificacao = document.getElementById("loginIdentificacao").value;
+            if (identificacao.includes('@')) identificacao = identificacao.split('@')[0];
+
+            localStorage.setItem("unidade_selecionada", "Recife");
+            localStorage.setItem("cliente_logado", identificacao);
+            window.location.href = "index.html";
+        });
+
+        // quando clica em cadastrar
+        document.getElementById("registerForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            // pega so o primeiro nome pra ficar mais amigavel
+            const nomeCompleto = document.getElementById("cadNome").value;
+            const primeiroNome = nomeCompleto.split(' ')[0];
+
+            const unidadeEscolhida = document.getElementById("cadUnidade").value;
+            localStorage.setItem("unidade_selecionada", unidadeEscolhida);
+            localStorage.setItem("cliente_logado", primeiroNome);
+            alert("Cadastro realizado com sucesso! Você ganhou 50 pontos de boas-vindas no Programa Raízes.");
+            window.location.href = "index.html";
+        });
+    </script>
+</body>
+
+</html>

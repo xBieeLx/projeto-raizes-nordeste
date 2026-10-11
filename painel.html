@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raízes do Nordeste - Gestão da Unidade</title>
+    <style>
+        :root {
+            --brand-color: #D35400;
+            --sidebar-bg: #2C3E50;
+            --bg-color: #F4F6F8;
+            --surface-color: #FFFFFF;
+            --text-main: #333333;
+            --border-color: #EAEAEA;
+            --success: #27AE60;
+            --warning: #F39C12;
+            --danger: #E74C3C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+        
+        body { display: flex; height: 100vh; background-color: var(--bg-color); color: var(--text-main); }
+
+        /* tela de login por cima de tudo */
+        #adminLoginOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 2000;
+        }
+
+        .login-box {
+            background: var(--surface-color); padding: 2.5rem; border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); width: 100%; max-width: 400px; text-align: center;
+        }
+
+        .login-box input, .login-box select { width: 100%; padding: 0.8rem; margin: 0.5rem 0 1.5rem 0; border: 1px solid #ccc; border-radius: 6px; }
+        .login-box button { width: 100%; padding: 1rem; background-color: var(--sidebar-bg); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+
+        /* menu lateral */
+        .sidebar {
+            width: 250px; background-color: var(--sidebar-bg); color: white;
+            display: flex; flex-direction: column; padding: 1.5rem 0;
+        }
+
+        .sidebar-brand { font-size: 1.2rem; font-weight: bold; text-align: center; margin-bottom: 2rem; color: var(--brand-color); }
+        
+        .nav-item { padding: 1rem 1.5rem; cursor: pointer; transition: 0.2s; border-left: 4px solid transparent; }
+        .nav-item:hover, .nav-item.active { background-color: rgba(255,255,255,0.1); border-left-color: var(--brand-color); }
+
+        /* conteudo do lado direito */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        
+        .topbar {
+            background-color: var(--surface-color); padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .store-status {
+            display: flex; align-items: center; gap: 0.5rem; font-weight: 500;
+        }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; background-color: var(--success); }
+        .status-dot.closed { background-color: var(--danger); }
+
+        .dashboard-container { padding: 2rem; display: none; }
+        .dashboard-container.active { display: block; }
+
+        h2 { margin-bottom: 0.5rem; }
+        .section-desc { color: #666; margin-bottom: 1.5rem; font-size: 0.95rem; }
+
+        /* cards padrao */
+        .card { background: var(--surface-color); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1.5rem; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        
+        /* estilo das tabelas */
+        .table-container { background: var(--surface-color); border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 1rem; border-bottom: 1px solid var(--border-color); }
+        th { background-color: #F8F9FA; font-weight: 600; font-size: 0.9rem; }
+        
+        .badge { padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+        .badge.pendente { background-color: #FFF3E0; color: var(--warning); }
+        .badge.pronto { background-color: #E8F5E9; color: var(--success); }
+        
+        /* cores do estoque */
+        .stock-normal { color: var(--success); font-weight: bold; }
+        .stock-low { color: var(--warning); font-weight: bold; }
+        .stock-critical { color: var(--danger); font-weight: bold; }
+
+        .btn-action { background: var(--brand-color); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
+        .btn-action.secondary { background: #EAEAEA; color: #333; }
+        .btn-action:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+    <!-- bloqueio de login do gerente -->
+    <div id="adminLoginOverlay">
+        <div class="login-box">
+            <h2 style="color: var(--brand-color); margin-bottom: 0.5rem;">Gestão de Unidade</h2>
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 1.5rem;">Acesso restrito para gerentes e equipe local.</p>
+            <form onsubmit="fazerLoginAdmin(event)">
+                <div style="text-align: left;">
+                    <label>Selecione sua Unidade</label>
+                    <select id="adminUnit" required>
+                        <option value="" disabled selected>Onde você trabalha?</option>
+                        <option value="Matriz Recife">Matriz (Recife)</option>
+                        <option value="Filial São Paulo">Filial São Paulo</option>
+                        <option value="Filial Curitiba">Filial Curitiba</option>
+                        <option value="Filial Porto Alegre">Filial Porto Alegre</option>
+                        <option value="Filial Florianópolis">Filial Florianópolis</option>
+                        <option value="Filial Campo Grande">Filial Campo Grande</option>
+                    </select>
+                    <label>Senha do Gerente</label>
+                    <input type="password" required>
+                </div>
+                <button type="submit">Entrar no Sistema</button>
+            </form>
+        </div>
+    </div>
+
+    <nav class="sidebar">
+        <div class="sidebar-brand">Raízes Unidade</div>
+        <div class="nav-item active" onclick="mudarAba('pedidos')">Monitor de Pedidos</div>
+        <div class="nav-item" onclick="mudarAba('estoque')">Controle de Estoque</div>
+        <div class="nav-item" onclick="mudarAba('desempenho')">Desempenho Local</div>
+        <div class="nav-item" onclick="mudarAba('config')">Regras e Operação</div>
+        <div class="nav-item" style="margin-top: auto; color: #E74C3C;" onclick="location.reload()">Sair do Sistema</div>
+    </nav>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div>
+                <strong>Unidade: </strong> <span id="viewUnitLabel">Matriz Recife</span>
+            </div>
+            <div class="store-status">
+                <div class="status-dot" id="dotStatus"></div>
+                <span id="txtStatusLoja">Loja Aberta</span>
+                <span style="color:#ccc; margin: 0 0.5rem;">|</span>
+                <span id="relogio">00:00:00</span>
+            </div>
+        </header>
+
+        <!-- tela da cozinha (kds) -->
+        <section id="aba-pedidos" class="dashboard-container active">
+            <h2>Monitor de Pedidos (KDS)</h2>
+            <p class="section-desc">Acompanhe e gerencie os pedidos recebidos via App, Totem e Balcão.</p>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID / Origem</th>
+                            <th>Cliente</th>
+                            <th>Itens</th>
+                            <th>Status</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaPedidos">
+                        <!-- o js vai jogar os pedidos novos por aqui -->
+                        <tr>
+                            <td><strong>#1041</strong> <br><small style="color:#666;">Totem Loja</small></td>
+                            <td>Cliente Avulso</td>
+                            <td>2x Tapioca de Carne de Sol, 1x Suco de Cajá</td>
+                            <td><span class="badge pendente">Na Cozinha</span></td>
+                            <td><button class="btn-action" onclick="finalizarPedido(this)">Marcar como Pronto</button></td>
+                        </tr>
+                        <tr>
+                            <td><strong>#1040</strong> <br><small style="color:#666;">App Delivery</small></td>
+                            <td>Roberto Mendes</td>
+                            <td>1x Baião de Dois</td>
+                            <td><span class="badge pronto">Aguardando Motoboy</span></td>
+                            <td><button class="btn-action secondary" onclick="this.parentElement.parentElement.style.display='none'">Despachado</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- tela de estoque da loja -->
+        <section id="aba-estoque" class="dashboard-container">
+            <h2>Controle de Estoque Local</h2>
+            <p class="section-desc">Gerenciamento de insumos e matérias-primas da unidade.</p>
+            
+            <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="margin-bottom: 0.3rem;">Solicitação à Matriz Central</h3>
+                    <p style="font-size: 0.9rem; color: #666;">Último pedido de reposição feito há 2 dias.</p>
+                </div>
+                <button class="btn-action" onclick="alert('Pedido de reposição dos itens críticos enviado à central de distribuição!')">Solicitar Reposição</button>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Insumo / Produto</th>
+                            <th>Categoria</th>
+                            <th>Qtd. Atual</th>
+                            <th>Estoque Mínimo</th>
+                            <th>Status</th>
+                            <th>Ajuste Manual</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Goma de Tapioca</strong></td>
+                            <td>Matéria-prima</td>
+                            <td>45 kg</td>
+                            <td>20 kg</td>
+                            <td class="stock-normal">Normal</td>
+                            <td><button class="btn-action secondary" onclick="ajustarEstoque(this)">Ajustar</button></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Queijo Coalho</strong></td>
+                            <td>Perecíveis</td>
+                            <td>12 kg</td>
+                            <td>15 kg</td>
+                            <td class="stock-low">Baixo (Atenção)</td>
+                            <td><button class="btn-action secondary" onclick="ajustarEstoque(this)">Ajustar</button></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Carne de Sol Desfiada</strong></td>
+                            <td>Perecíveis</td>
+                            <td>3 kg</td>
+                            <td>10 kg</td>
+                            <td class="stock-critical">Crítico</td>
+                            <td><button class="btn-action secondary" onclick="ajustarEstoque(this)">Ajustar</button></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Embalagens Delivery (G)</strong></td>
+                            <td>Suprimentos</td>
+                            <td>450 un</td>
+                            <td>100 un</td>
+                            <td class="stock-normal">Normal</td>
+                            <td><button class="btn-action secondary" onclick="ajustarEstoque(this)">Ajustar</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- tela de vendas de hoje -->
+        <section id="aba-desempenho" class="dashboard-container">
+            <h2>Desempenho da Unidade</h2>
+            <p class="section-desc">Metas e indicadores de vendas referentes apenas à sua loja.</p>
+            <div class="kpi-grid">
+                <div class="card">
+                    <h4 style="color:#666; font-size:0.9rem; margin-bottom:0.5rem;">Faturamento (Hoje)</h4>
+                    <div style="font-size: 1.8rem; font-weight: bold; color: var(--brand-color);">R$ 2.450,00</div>
+                </div>
+                <div class="card">
+                    <h4 style="color:#666; font-size:0.9rem; margin-bottom:0.5rem;">Pedidos Realizados</h4>
+                    <div style="font-size: 1.8rem; font-weight: bold; color: var(--brand-color);">63</div>
+                </div>
+                <div class="card">
+                    <h4 style="color:#666; font-size:0.9rem; margin-bottom:0.5rem;">Ticket Médio</h4>
+                    <div style="font-size: 1.8rem; font-weight: bold; color: var(--brand-color);">R$ 38,90</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- tela de abrir/fechar loja -->
+        <section id="aba-config" class="dashboard-container">
+            <h2>Regras de Funcionamento</h2>
+            <p class="section-desc">Controle o status da sua loja e os tempos de estimativa para os clientes.</p>
+            
+            <div class="kpi-grid">
+                <div class="card">
+                    <h3>Status da Operação</h3>
+                    <p style="font-size: 0.9rem; color: #666; margin: 0.5rem 0 1.5rem 0;">Pausar o recebimento de novos pedidos via App.</p>
+                    <button id="btnToggleStore" class="btn-action" style="background: var(--danger); width: 100%;" onclick="toggleLoja()">Fechar Loja Agora</button>
+                </div>
+
+                <div class="card">
+                    <h3>Tempo de Delivery</h3>
+                    <p style="font-size: 0.9rem; color: #666; margin: 0.5rem 0 1rem 0;">Estimativa mostrada no App.</p>
+                    <select class="btn-action secondary" style="width: 100%; padding: 0.8rem; text-align: center;">
+                        <option>30 - 45 minutos</option>
+                        <option selected>45 - 60 minutos</option>
+                        <option>60 - 90 minutos (Alta demanda)</option>
+                    </select>
+                </div>
+
+                <div class="card">
+                    <h3>Tempo de Retirada</h3>
+                    <p style="font-size: 0.9rem; color: #666; margin: 0.5rem 0 1rem 0;">Estimativa para pedidos balcão/app.</p>
+                    <select class="btn-action secondary" style="width: 100%; padding: 0.8rem; text-align: center;">
+                        <option>10 - 15 minutos</option>
+                        <option selected>15 - 25 minutos</option>
+                        <option>Mais de 30 minutos</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        setInterval(() => { document.getElementById("relogio").textContent = new Date().toLocaleTimeString(); }, 1000);
+
+        function fazerLoginAdmin(event) {
+            event.preventDefault();
+            const unidade = document.getElementById("adminUnit").value;
+            document.getElementById("viewUnitLabel").textContent = unidade;
+            document.getElementById("adminLoginOverlay").style.display = "none";
+            
+            verificarPedidoNovo(); 
+        }
+
+        function mudarAba(aba) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.dashboard-container').forEach(el => el.classList.remove('active'));
+            
+            document.querySelector(`.nav-item[onclick="mudarAba('${aba}')"]`).classList.add('active');
+            document.getElementById(`aba-${aba}`).classList.add('active');
+        }
+
+        // arruma a qtd de estoque na mao
+        function ajustarEstoque(btn) {
+            const tr = btn.closest('tr');
+            const item = tr.querySelector('td:first-child strong').textContent;
+            const novaQtd = prompt(`Ajuste manual de estoque.\nInsumo: ${item}\nDigite a nova quantidade (ex: 20 kg):`);
+            if(novaQtd) {
+                tr.querySelector('td:nth-child(3)').textContent = novaQtd;
+                alert('Estoque atualizado e registrado na auditoria da matriz.');
+                // na vida real a cor do status mudaria sozinha aqui
+            }
+        }
+
+        // abre ou fecha a loja pros clientes no app
+        let lojaAberta = true;
+        function toggleLoja() {
+            lojaAberta = !lojaAberta;
+            const btn = document.getElementById("btnToggleStore");
+            const dot = document.getElementById("dotStatus");
+            const txt = document.getElementById("txtStatusLoja");
+
+            if(lojaAberta) {
+                btn.textContent = "Fechar Loja Agora";
+                btn.style.background = "var(--danger)";
+                dot.classList.remove("closed");
+                txt.textContent = "Loja Aberta";
+            } else {
+                btn.textContent = "Reabrir Loja";
+                btn.style.background = "var(--success)";
+                dot.classList.add("closed");
+                txt.textContent = "Loja Fechada";
+            }
+        }
+
+        // puxa se o cliente pediu no site e joga pra ca
+        function verificarPedidoNovo() {
+            if (localStorage.getItem("pedido_em_andamento") === "true") {
+                const cliente = localStorage.getItem("cliente_logado") || "Cliente App";
+                const total = parseFloat(localStorage.getItem("total_carrinho") || "0");
+                // para o prototipo saber se é delivery
+                const isDelivery = localStorage.getItem("enderecos_cliente") && localStorage.getItem("enderecos_cliente").length > 0 ? "App Delivery" : "App Retirada"; 
+                
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td><strong style="color:var(--brand-color);">#1042 (NOVO)</strong><br><small style="color:#666;">${isDelivery}</small></td>
+                    <td>${cliente}</td>
+                    <td>Pedido Online (R$ ${total.toFixed(2).replace('.', ',')})</td>
+                    <td><span class="badge pendente">Na Cozinha</span></td>
+                    <td><button class="btn-action" onclick="finalizarPedido(this)">Marcar como Pronto</button></td>
+                `;
+                const lista = document.getElementById("listaPedidos");
+                lista.insertBefore(tr, lista.firstChild);
+            }
+        }
+
+        function finalizarPedido(btn) {
+            const tr = btn.closest('tr');
+            tr.querySelector('td:nth-child(4)').innerHTML = '<span class="badge pronto">Pronto / Despachado</span>';
+            btn.className = "btn-action secondary";
+            btn.textContent = "Finalizar no PDV";
+            btn.onclick = function() { tr.style.display = 'none'; };
+            localStorage.removeItem("pedido_em_andamento"); 
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Raízes do Nordeste - Pagamento</title>
+    <style>
+        :root {
+            --brand-color: #D35400;
+            --bg-color: #FAFAFA;
+            --surface-color: #FFFFFF;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --border-color: #EAEAEA;
+            --success-color: #27AE60;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        .topbar {
+            background-color: var(--surface-color);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: var(--brand-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .container {
+            padding: 1.5rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        /* itens do resumo */
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+        }
+
+        .total-row {
+            font-weight: bold;
+            font-size: 1.2rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        /* pontos e descontos */
+        .loyalty-box {
+            background-color: #FFF3E0;
+            border: 1px solid #FFE0B2;
+            padding: 1rem;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .loyalty-info p {
+            font-size: 0.9rem;
+            color: var(--brand-color);
+        }
+
+        .loyalty-btn {
+            background-color: var(--brand-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .loyalty-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* opcoes de pagamento */
+        .payment-methods {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .method-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .method-label:has(input:checked) {
+            border-color: var(--brand-color);
+            background-color: #FFF9F5;
+        }
+
+        .pay-btn {
+            width: 100%;
+            background-color: var(--brand-color);
+            color: white;
+            border: none;
+            padding: 1.2rem;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        /* tela escura de loading */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--brand-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .success-icon {
+            font-size: 4rem;
+            color: var(--success-color);
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <!-- botao de voltar -->
+        <a href="cardapio.html" class="back-btn" onclick="history.back(); return false;">← Voltar</a>
+        <h2>Finalizar Pedido</h2>
+    </header>
+
+    <div class="container" id="mainContainer">
+        
+        <div class="card">
+            <h3>Resumo do Pedido</h3>
+            <div id="orderItems">
+                <!-- js vai colocar os itens aqui -->
+            </div>
+            
+            <div class="loyalty-box" style="margin: 1.5rem 0;">
+                <div class="loyalty-info">
+                    <p><strong>Programa Raízes</strong></p>
+                    <p id="pointsText">Você tem 200 pontos</p>
+                </div>
+                <button class="loyalty-btn" id="btnResgatar" onclick="aplicarDesconto()">Usar 100 pts (R$ 5 OFF)</button>
+            </div>
+
+            <div class="summary-row total-row">
+                <span>Total a Pagar</span>
+                <span id="finalTotal">R$ 0,00</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Método de Recebimento</h3>
+            <div class="payment-methods" style="margin-bottom: 1rem;">
+                <label class="method-label">
+                    <input type="radio" name="tipoRecebimento" value="retirada" checked onchange="alternarEntrega()"> 
+                    Retirada na Loja (<span id="chkUnidade">Matriz</span>)
+                </label>
+                <label class="method-label">
+                    <input type="radio" name="tipoRecebimento" value="delivery" onchange="alternarEntrega()"> 
+                    Delivery (Entrega)
+                </label>
+            </div>
+            
+            <!-- só aparece se marcar delivery -->
+            <div id="areaEnderecos" class="hidden" style="background:#F8F9FA; padding:1rem; border-radius:6px; border:1px solid var(--border-color);">
+                <label style="display:block; margin-bottom:0.5rem; font-size:0.9rem; font-weight:bold;">Selecione o endereço de entrega:</label>
+                <select id="selectEnderecoDelivery" style="width:100%; padding:0.8rem; border:1px solid #ccc; border-radius:6px;">
+                    <!-- preenchido pelo js -->
+                </select>
+                <p id="avisoSemEndereco" class="hidden" style="color:var(--brand-color); font-size:0.85rem; margin-top:0.5rem;">
+                    Nenhum endereço cadastrado. <a href="perfil.html" style="color:var(--brand-color);">Adicione no seu perfil</a>.
+                </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Forma de Pagamento</h3>
+            <div class="payment-methods">
+                <label class="method-label">
+                    <input type="radio" name="pagamento" value="pix" checked> PIX (Aprovação imediata)
+                </label>
+                <label class="method-label">
+                    <input type="radio" name="pagamento" value="credito"> Cartão de Crédito
+                </label>
+            </div>
+        </div>
+
+        <button class="pay-btn" onclick="processarPagamento()">Confirmar Pagamento</button>
+    </div>
+
+    <!-- telas que aparecem por cima -->
+    <div class="overlay hidden" id="processingScreen">
+        <div class="spinner"></div>
+        <h2>Processando Pagamento...</h2>
+        <p style="color: var(--text-muted); margin-top: 0.5rem;">Aguardando retorno da operadora externa</p>
+    </div>
+
+    <div class="overlay hidden" id="successScreen">
+        <div class="success-icon">✓</div>
+        <h2>Pagamento Aprovado!</h2>
+        <p style="margin: 1rem 0;">Seu pedido já foi enviado para a cozinha.</p>
+        <div style="background: var(--bg-color); padding: 1rem; border-radius: 8px; width: 80%; max-width: 300px; text-align: center;">
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Status do Pedido</p>
+            <h3 style="color: var(--brand-color); margin-top: 0.5rem; border:none;">Na Cozinha (Preparo)</h3>
+        </div>
+        <button class="loyalty-btn" style="margin-top: 2rem;" onclick="window.location.href='index.html'">Voltar ao Início</button>
+    </div>
+
+    <script>
+        let totalOriginal = parseFloat(localStorage.getItem("total_carrinho")) || 0;
+        let totalFinal = totalOriginal;
+        let descontoAplicado = false;
+
+        function carregarResumo() {
+            const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+            const container = document.getElementById("orderItems");
+            
+            if (carrinho.length === 0) {
+                container.innerHTML = "<p>Seu carrinho está vazio.</p>";
+                return;
+            }
+
+            carrinho.forEach(item => {
+                container.innerHTML += `
+                    <div class="summary-row">
+                        <span>1x ${item.nome}</span>
+                        <span>R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                `;
+            });
+
+            atualizarTotal();
+        }
+
+        function aplicarDesconto() {
+            if (descontoAplicado || totalOriginal < 5) return;
+            
+            totalFinal = totalOriginal - 5;
+            descontoAplicado = true;
+            
+            document.getElementById("btnResgatar").textContent = "Desconto Aplicado!";
+            document.getElementById("btnResgatar").disabled = true;
+            
+            // joga o aviso do desconto na tela
+            const container = document.getElementById("orderItems");
+            container.innerHTML += `
+                <div class="summary-row" style="color: var(--brand-color); font-weight: bold; margin-top: 0.5rem;">
+                    <span>Desconto Fidelidade</span>
+                    <span>- R$ 5,00</span>
+                </div>
+            `;
+            
+            atualizarTotal();
+        }
+
+        function atualizarTotal() {
+            document.getElementById("finalTotal").textContent = `R$ ${totalFinal.toFixed(2).replace('.', ',')}`;
+        }
+
+        function processarPagamento() {
+            const tipo = document.querySelector('input[name="tipoRecebimento"]:checked').value;
+            const enderecos = JSON.parse(localStorage.getItem("enderecos_cliente")) || [];
+            
+            // checa se tem endereco antes de pagar
+            if (tipo === "delivery" && enderecos.length === 0) {
+                alert("Para pedir Delivery, cadastre um endereço primeiro!");
+                return;
+            }
+
+            if (totalOriginal === 0) {
+                alert("Adicione itens ao carrinho primeiro!");
+                return;
+            }
+
+            // mostra a tela de carregamento fingindo que é a api do cartao
+            document.getElementById("mainContainer").classList.add("hidden");
+            document.getElementById("processingScreen").classList.remove("hidden");
+
+            // espera 3 segs pra simular a aprovação
+            setTimeout(() => {
+                document.getElementById("processingScreen").classList.add("hidden");
+                document.getElementById("successScreen").classList.remove("hidden");
+                
+                // avisa para o perfil que tem pedido em andamento
+                localStorage.setItem("pedido_em_andamento", "true");
+                
+                // limpa os dados do carrinho
+                localStorage.removeItem("carrinho");
+                localStorage.removeItem("total_carrinho");
+            }, 3000);
+        }
+
+        // mostra o nome da loja
+        document.getElementById("chkUnidade").textContent = localStorage.getItem("unidade_selecionada") || "Recife";
+
+        // mostra ou esconde a caixa de endereco
+        function alternarEntrega() {
+            const tipo = document.querySelector('input[name="tipoRecebimento"]:checked').value;
+            const areaEnderecos = document.getElementById("areaEnderecos");
+            const selectEndereco = document.getElementById("selectEnderecoDelivery");
+            const avisoSemEndereco = document.getElementById("avisoSemEndereco");
+            
+            if (tipo === "delivery") {
+                areaEnderecos.classList.remove("hidden");
+                const enderecos = JSON.parse(localStorage.getItem("enderecos_cliente")) || [];
+                
+                if (enderecos.length === 0) {
+                    selectEndereco.classList.add("hidden");
+                    avisoSemEndereco.classList.remove("hidden");
+                } else {
+                    selectEndereco.classList.remove("hidden");
+                    avisoSemEndereco.classList.add("hidden");
+                    selectEndereco.innerHTML = "";
+                    
+                    enderecos.forEach(end => {
+                        selectEndereco.innerHTML += `<option value="${end.titulo}">${end.titulo} - ${end.texto}</option>`;
+                    });
+                }
+            } else {
+                areaEnderecos.classList.add("hidden");
+            }
+        }
+
+        carregarResumo();
+    </script>
+</body>
+</html>

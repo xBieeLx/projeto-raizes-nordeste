@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raízes do Nordeste - Portal da Franqueadora</title>
+    <style>
+        :root {
+            --brand-color: #D35400; --sidebar-bg: #1A252F; --bg-color: #F4F6F8;
+            --surface-color: #FFFFFF; --text-main: #333333; --border-color: #EAEAEA;
+            --danger: #E74C3C; --success: #27AE60;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+        body { display: flex; height: 100vh; background-color: var(--bg-color); color: var(--text-main); }
+
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; display: flex; flex-direction: column; padding: 1.5rem 0; }
+        .sidebar-brand { font-size: 1.3rem; font-weight: bold; text-align: center; margin-bottom: 2rem; color: var(--brand-color); }
+        .nav-item { padding: 1rem 1.5rem; cursor: pointer; transition: 0.2s; border-left: 4px solid transparent; font-size: 0.95rem; }
+        .nav-item:hover, .nav-item.active { background-color: rgba(255,255,255,0.05); border-left-color: var(--brand-color); }
+
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        .topbar { background-color: var(--surface-color); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .dashboard-container { padding: 2rem; display: none; }
+        .dashboard-container.active { display: block; }
+
+        h2 { margin-bottom: 0.5rem; color: #2C3E50; }
+        .section-desc { color: #666; margin-bottom: 1.5rem; font-size: 0.95rem; }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .kpi-card { background: var(--surface-color); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .kpi-card h4 { color: #7F8C8D; font-size: 0.85rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .kpi-card .value { font-size: 2rem; font-weight: bold; color: var(--sidebar-bg); }
+
+        .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .table-container { background: var(--surface-color); border-radius: 8px; border: 1px solid var(--border-color); padding: 1.5rem; margin-bottom: 1.5rem; }
+        .table-container h3 { margin-bottom: 1rem; font-size: 1.1rem; color: var(--brand-color); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; }
+        
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 0.8rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; }
+        th { color: #7F8C8D; font-weight: 600; }
+        tr:last-child td { border-bottom: none; }
+
+        .badge-audit { padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        .badge-discount { background-color: #FDEBD0; color: #D35400; }
+        .badge-cancel { background-color: #FADBD8; color: var(--danger); }
+        
+        .badge-status-on { background-color: #E8F5E9; color: var(--success); padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.8rem; font-weight: bold; display: inline-block;}
+        .badge-status-off { background-color: #F2F4F4; color: #7F8C8D; padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.8rem; font-weight: bold; display: inline-block;}
+
+        .btn-toggle { background: none; border: 1px solid var(--border-color); padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+        .btn-toggle:hover { background: #EEE; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-brand">Raízes Global</div>
+        <div class="nav-item active" onclick="mudarAba('visao-geral')">Visão Geral da Rede</div>
+        <div class="nav-item" onclick="mudarAba('cardapio')">Controle de Cardápio</div>
+        <div class="nav-item" onclick="mudarAba('auditoria')">Auditoria de Operações</div>
+        <div class="nav-item" style="margin-top: auto; color: #E74C3C;" onclick="window.location.href='index.html'">Sair do Sistema</div>
+    </nav>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div><strong>Acesso Administrativo:</strong> Diretoria Central</div>
+            <div id="dataAtual"></div>
+        </header>
+
+        <!-- primeira aba: geral -->
+        <section id="aba-visao-geral" class="dashboard-container active">
+            <h2>Desempenho Consolidado</h2>
+            <p class="section-desc">Métricas financeiras e de vendas de toda a rede de franquias.</p>
+            <div class="kpi-grid">
+                <div class="kpi-card"><h4>Faturamento Total</h4><div class="value">R$ 142.580,00</div></div>
+                <div class="kpi-card"><h4>Unidades Ativas</h4><div class="value">6</div></div>
+                <div class="kpi-card"><h4>Produto Destaque</h4><div class="value" style="font-size: 1.4rem; color: var(--brand-color); margin-top: 0.5rem;">Cuscuz Completo</div></div>
+            </div>
+            <div class="grid-2-col">
+                <div class="table-container" style="margin-bottom: 0;">
+                    <h3 style="color: var(--sidebar-bg);">Vendas por Região</h3>
+                    <table>
+                        <thead><tr><th>Unidade</th><th>Faturamento</th><th>Status</th></tr></thead>
+                        <tbody>
+                            <tr><td>Matriz (Recife)</td><td>R$ 58.200,00</td><td style="color: #27AE60;">Meta Atingida</td></tr>
+                            <tr><td>Filial São Paulo</td><td>R$ 45.100,00</td><td style="color: #27AE60;">Meta Atingida</td></tr>
+                            <tr><td>Filial Curitiba</td><td>R$ 39.280,00</td><td style="color: #F39C12;">Atenção</td></tr>
+                            <tr><td>Filial Porto Alegre</td><td>R$ 35.400,00</td><td style="color: #27AE60;">Meta Atingida</td></tr>
+                            <tr><td>Filial Florianópolis</td><td>R$ 31.800,00</td><td style="color: #27AE60;">Meta Atingida</td></tr>
+                            <tr><td>Filial Campo Grande</td><td>R$ 28.500,00</td><td style="color: #E74C3C;">Crítico</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- segunda aba: cardapio -->
+        <section id="aba-cardapio" class="dashboard-container">
+            <h2>Gestão de Cardápio e Sazonalidade</h2>
+            <p class="section-desc">Controle a base de produtos da franquia, exclusividades regionais e campanhas temporárias.</p>
+
+            <!-- pratos fixos -->
+            <div class="table-container">
+                <h3>Cardápio Fixo (Obrigatório em Todas as Unidades)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">Produto</th>
+                            <th style="width: 30%;">Categoria</th>
+                            <th style="width: 20%;">Status no App</th>
+                            <th style="width: 20%;">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Cuscuz Completo</strong></td>
+                            <td>Clássicos Nordestinos</td>
+                            <td><span class="badge-status-on">Ativo</span></td>
+                            <td><button class="btn-toggle" disabled style="opacity: 0.5;">Fixo da Marca</button></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tapioca de Carne de Sol</strong></td>
+                            <td>Tapiocas</td>
+                            <td><span class="badge-status-on">Ativo</span></td>
+                            <td><button class="btn-toggle" disabled style="opacity: 0.5;">Fixo da Marca</button></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Baião de Dois</strong></td>
+                            <td>Clássicos Nordestinos</td>
+                            <td><span class="badge-status-on">Ativo</span></td>
+                            <td><button class="btn-toggle" disabled style="opacity: 0.5;">Fixo da Marca</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- pratos de cada regiao -->
+            <div class="table-container">
+                <h3>Cardápio Regional (Exclusividades de Franquias)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">Produto</th>
+                            <th style="width: 30%;">Disponibilidade</th>
+                            <th style="width: 20%;">Status no App</th>
+                            <th style="width: 20%;">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Tapioca de Pernil Paulista</strong></td>
+                            <td style="color: var(--text-main); font-weight:500;">Filial São Paulo</td>
+                            <td><span class="badge-status-on">Ativo</span></td>
+                            <td><button class="btn-toggle" onclick="alert('Configuração restrita ao administrador da região.')">Gerenciar Filial</button></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tapioca de Erva-Mate</strong></td>
+                            <td style="color: var(--text-main); font-weight:500;">Porto Alegre / Campo Grande</td>
+                            <td><span class="badge-status-on">Ativo</span></td>
+                            <td><button class="btn-toggle" onclick="alert('Configuração restrita ao administrador da região.')">Gerenciar Filial</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- pratos de epoca -->
+            <div class="table-container">
+                <h3>Campanhas Sazonais (Controle de Temporada)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">Produto</th>
+                            <th style="width: 30%;">Período Alvo</th>
+                            <th style="width: 20%;">Status no App</th>
+                            <th style="width: 20%;">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Canjica (Mungunzá) Doce</strong></td>
+                            <td>Festas Juninas</td>
+                            <td><span class="badge-status-on" id="statusCanjica">Ativo (Em Campanha)</span></td>
+                            <td><button class="btn-toggle" onclick="toggleStatus(this, 'statusCanjica')">Encerrar Temporada</button></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Bolo de Milho Verde</strong></td>
+                            <td>Festas Juninas</td>
+                            <td><span class="badge-status-on" id="statusBolo">Ativo (Em Campanha)</span></td>
+                            <td><button class="btn-toggle" onclick="toggleStatus(this, 'statusBolo')">Encerrar Temporada</button></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Escondidinho de Pinhão</strong></td>
+                            <td>Inverno (Região Sul)</td>
+                            <td><span class="badge-status-off" id="statusPinhao">Inativo (Fora de Época)</span></td>
+                            <td><button class="btn-toggle" onclick="toggleStatus(this, 'statusPinhao')">Ativar Temporada</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- aba 3: auditoria e logs -->
+        <section id="aba-auditoria" class="dashboard-container">
+            <h2>Auditoria de Operações Sensíveis</h2>
+            <p class="section-desc">Monitoramento de cancelamentos, uso de pontos e ajustes operacionais.</p>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Data/Hora</th><th>Unidade</th><th>Operador</th><th>Tipo de Operação</th><th>Detalhes</th></tr></thead>
+                    <tbody id="listaAuditoria">
+                        <tr><td>Hoje - 14:32</td><td>Filial São Paulo</td><td>Gerente Carlos</td><td><span class="badge-audit badge-cancel">Cancelamento</span></td><td>Pedido #0884 cancelado. Falta de insumos.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.getElementById("dataAtual").textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        function mudarAba(aba) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.dashboard-container').forEach(el => el.classList.remove('active'));
+            
+            document.querySelector(`.nav-item[onclick="mudarAba('${aba}')"]`).classList.add('active');
+            document.getElementById(`aba-${aba}`).classList.add('active');
+        }
+
+        // liga ou desliga os pratos de epoca
+        function toggleStatus(btn, spanId) {
+            const span = document.getElementById(spanId);
+            if (span.textContent.includes("Ativo")) {
+                span.textContent = "Inativo (Fora de Época)";
+                span.className = "badge-status-off";
+                btn.textContent = "Ativar Temporada";
+            } else {
+                span.textContent = "Ativo (Em Campanha)";
+                span.className = "badge-status-on";
+                btn.textContent = "Encerrar Temporada";
+            }
+            alert("A base de dados das franquias foi atualizada. O prato foi sincronizado no app dos clientes.");
+        }
+
+        // checa se alguem usou ponto de fidelidade pra jogar no log
+        function verificarAuditoria() {
+            const desconto = localStorage.getItem("desconto_fidelidade_usado");
+            if (desconto === "true") {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `<td style="font-weight:bold; color:var(--brand-color);">Agora</td><td>App Cliente</td><td>Sistema Fidelidade</td><td><span class="badge-audit badge-discount">Desconto</span></td><td>Resgate de pontos (R$ 5,00 OFF).</td>`;
+                document.getElementById("listaAuditoria").insertBefore(tr, document.getElementById("listaAuditoria").firstChild);
+                localStorage.removeItem("desconto_fidelidade_usado");
+            }
+        }
+        window.onload = verificarAuditoria;
+    </script>
+</body>
+</html>
